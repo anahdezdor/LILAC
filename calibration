@@ -1,0 +1,38 @@
+calibration <- function(data, model=myModel, estimator="MLMVS"){
+  library(lavaan)
+  
+  numvar <- ncol(data)
+ 
+  
+  
+  
+
+  
+  fit <- cfa(model=model, data=data, meanstructure=FALSE, std.lv=TRUE, estimator=estimator)
+  
+  beta <- parameterEstimates(fit)[1:(ncol(data)),4]
+  intercept <- colMeans(data)
+  alpha <- exp(intercept)
+  resvar <- parTable(fit)[((numvar)+1):(numvar*2), 14]
+  
+  se_b <- parameterEstimates(fit)[1:(ncol(data)),5]
+  ci_l<- parameterEstimates(fit)[1:(ncol(data)),8]
+  ci_u<- parameterEstimates(fit)[1:(ncol(data)),9]
+  
+  itemdif <- (1/alpha)^(1/beta)
+
+  
+  
+  parameters <- data.frame(alpha=alpha, beta=beta, S.E.beta = se_b, item_dificulty=itemdif,  res_var=resvar)
+  
+  
+  
+  gof <- round(fitMeasures(fit),3)
+ 
+  mylist <- list(parameters=parameters, gof=gof)
+  
+  return(mylist)
+  
+}
+
+
